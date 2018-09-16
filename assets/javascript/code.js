@@ -16,9 +16,9 @@ var p1Wins = 0, p2Wins = 0, ties = 0;
 var winner = "";
 var playerNum = 0;
 
-$(".wins1").text(p1Wins);
-$(".wins2").text(p2Wins);
-$(".ties").text(ties);
+//playerNum will only change when playerLocked is false
+//once it is set to true (happens in connectionRef), the player will be locked in 
+var playerLocked = false;
 
 var winCases = [
   {
@@ -39,97 +39,134 @@ var database = firebase.database();
 var gameDataRef = firebase.database().ref("gameData");
 var p1Ref = firebase.database().ref("player1Data");
 var p2Ref = firebase.database().ref("player2Data");
+var infoRef = firebase.database().ref("info");
 
 var connectionsRef = database.ref("/connections");
 var connectedRef = database.ref(".info/connected");
 
-//when client's connection state changes
-connectedRef.on("value", function(snap){
-  //if they are connected
-  if(snap.val()){
-    //add user to the connection list
-    var con = connectionsRef.push(true);
-    //remove user from the connection list when they disconnect
-    con.onDisconnect().remove();
-  }
-});
 
-  //gets the total number of connectioned users by counting
-  //how many conenctions are in the 'connections' reference
-  connectionsRef.on("value", function(snap) {
-    playerNum = snap.numChildren();
-  });
-
-  gameDataRef.on("value", function(snapshot){
-    var data = snapshot.val();
-    p1Wins = data.player1Wins;
-    p2Wins = data.player2Wins;
-    ties = data.ties;
-  });
-  
-  p1Ref.on("value", function(snapshot){
-    var data = snapshot.val();
-    p1Answer = data.player1Answer;
-    p1Ready = data.player1Ready;
-  });
-  
-  p2Ref.on("value", function(snapshot){
-    var data = snapshot.val();
-    p2Answer = data.player2Answer;
-    p2Ready = data.player2Ready;
-  });
 
 $(document).ready(function(){  
   
-  //need to somehow retrive values from firebase before this step
-  //firebase is waiting until a value is changed before it goes and grabs data
-  //from the above snapshot methods
-  $(".wins1").text(p1Wins);
-  $(".wins2").text(p2Wins);
-  $(".ties").text(ties);
+//when client's connection state changes
+connectedRef.on("value", function(snap){
+    //if they are connected
+    if(snap.val()){
+      //add user to the connection list
+      var con = connectionsRef.push(true);
+      //remove user from the connection list when they disconnect
+      con.onDisconnect().remove();
+    }
+  });
   
-  console.log("playerNum: " + playerNum);
-  if(playerNum === 1 || playerNum === 2){
-    $(".player").text(playerNum);
-  }
-  else{
-    $(".player").text("Spectating");
-  }
+    //gets the total number of connectioned users by counting
+    //how many conenctions are in the 'connections' reference
+    connectionsRef.on("value", function(snap) {
+        if(!playerLocked){
+            console.log("connectsRef child added");
+            playerNum = snap.numChildren();
+            console.log("playerNum: " + playerNum);
+            if(playerNum === 1 || playerNum === 2){
+                $(".player").text("Player " + playerNum);
+            }
+            else{
+                $(".player").text("Spectating");
+            }
+            playerLocked = true;
+        }
+    });
+  
+    gameDataRef.on("value", function(snapshot){
+      console.log("gameDataRef child added");
+      var data = snapshot.val();
+      p1Wins = data.player1Wins;
+      p2Wins = data.player2Wins;
+      ties = data.ties;
+      console.log("p1Wins: " + p1Wins);
+      console.log("p2Wins: " + p2Wins);
+      console.log("ties: " + ties);
+      $(".wins1").text(p1Wins);
+      $(".wins2").text(p2Wins);
+      $(".ties").text(ties);
+    });
+    
+    p1Ref.on("value", function(snapshot){
+      console.log("p1Ref child added");
+      var data = snapshot.val();
+      p1Answer = data.player1Answer;
+      p1Ready = data.player1Ready;
+      console.log("p1Answer: " + p1Answer);
+      console.log("p1Ready: " + p1Ready);
+      /*if(p1Ready && !p2Ready){
+        $(".info").text("Waiting for Player 2...");
+      }*/
+    });
+    
+    p2Ref.on("value", function(snapshot){
+      console.log("p2Ref child added");
+      var data = snapshot.val();
+      p2Answer = data.player2Answer;
+      p2Ready = data.player2Ready;
+      console.log("p2Answer: " + p2Answer);
+      console.log("p2Ready: " + p2Ready);
+      /*if(!p1Ready && p2Ready){
+        $(".info").text("Waiting for Player 1...");
+      }*/
+    });
+
+    infoRef.on("value", function(snapshot){
+        var data = snapshot.val();
+        $(".info").text(data.info);
+    })
   
   $(document).on("click", function(event){
-    console.log("playerNum: " + playerNum);
-    var targ = event.target;
-    var id = targ.id;
-    
-    //add (playerNum === 1)
-    if(id === "p1" && !p1Ready){
-      p1Answer = targ.value;
-      p1Ready = true;
-      p1Ref.set({
-        player1Ready:p1Ready,   
-        player1Answer:p1Answer
-      });
-      $(".info").text("Waiting for Player 2...");
+    if(playerNum === 1 || playerNum === 2){
+        console.log("click");
+        console.log("playerNum: " + playerNum);
+        var targ = event.target;
+        var id = targ.id;
+        
+        //add (playerNum === 1)
+        if(id === "p1" && !p1Ready && playerNum === 1){
+        console.log("p1 click");
+        p1Answer = targ.value;
+        p1Ready = true;
+        p1Ref.set({
+            player1Ready:p1Ready,   
+            player1Answer:p1Answer
+        });
+        infoRef.set({
+            info:"Waiting for Player 2..."  
+            });
+        //$(".info").text("Waiting for Player 2...");
+        }
+        //add (playerNum === 2)
+        else if(id === "p2" && !p2Ready && playerNum === 2){
+        console.log("p2 click");
+        p2Answer = targ.value;
+        p2Ready = true;
+        p2Ref.set({
+            player2Ready:p2Ready,   
+            player2Answer:p2Answer
+        });
+        infoRef.set({
+            info:"Waiting for Player 1..."  
+            });
+        //$(".info").text("Waiting for Player 1...");
+        }
+        if(p1Ready && p2Ready){
+        checkWinner();
+        }  
     }
-    //add (playerNum === 2)
-    else if(id === "p2" && !p2Ready){
-      p2Answer = targ.value;
-      p2Ready = true;
-      p2Ref.set({
-        player2Ready:p2Ready,   
-        player2Answer:p2Answer
-      });
-      $(".info").text("Waiting for Player 1...");
-    }
-    if(p1Ready && p2Ready){
-      checkWinner();
-    }  
   });
   
   function checkWinner(){
     if(p1Answer === p2Answer){
       winner = "It's a tie"
       ties += 1;
+      infoRef.set({
+        info:winner   
+        });
     }
     else{
       var match = false;
@@ -138,12 +175,18 @@ $(document).ready(function(){
           winner = "Point for Player 1!";
           p1Wins += 1;
           match = true;
+          infoRef.set({
+            info:winner   
+            });
           break;
         }
       }
       if(!match){
         winner = "Point for Player 2!";
         p2Wins += 1;
+        infoRef.set({
+            info:winner   
+            });
       } 
     }
     

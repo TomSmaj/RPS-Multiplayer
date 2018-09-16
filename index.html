@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Rock Paper Scissors</title>
+  
+  <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+  
+
+<script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+
+<script src = "assets/javascript/code.js"></script>
+  
+</head>
+<body>
+  <h3>Player: <span class = "player"><span></h3>
+  <h3>Info: <span class = "info"></span></h3>
+  <div class = "player1">
+    <h3>Player 1, Wins: <span class = "wins1"></span></h3>
+    <button type = "button" id = "p1" value = "rock">Rock</button>
+    <button type = "button" id = "p1" value = "paper">Paper</button>
+    <button type = "button" id = "p1" value = "scissors">Scissors</button>
+  </div>
+  
+  <div class = "player2"> 
+    <h3>Player 2, Wins: <span class = "wins2"></span></h3> 
+    <button type = "button" id = "p2" value = "rock">Rock</button>
+    <button type = "button" id = "p2" value = "paper">Paper</button>
+    <button type = "button" id = "p2" value = "scissors">Scissors</button>
+  </div>
+  
+  <h3>Ties: <span class = "ties"></span></h3>
+  
+  <hr>
+  
+  <h3>Chat:</h3>
+  <div><textarea class = "chat" rows = "7" cols = "50" ></textarea></div>
+  <div><input class = "chat" type = "text" value = "Enter chat text here..." /></div>
+  
+  
+  
+</body>
+</html>
