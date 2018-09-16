@@ -75,10 +75,14 @@ connectedRef.on("value", function(snap){
             }
             playerLocked = true;
         }
+        //when the number of players drops down to 1, the stored chat and info being displayed is cleared
         if(snap.numChildren() === 1){
             $(".chatBox").val("");
             chatRef.set({
-                comment:" "
+                comment:""
+            });
+            infoRef.set({
+                info:""
             });
         }
     });
