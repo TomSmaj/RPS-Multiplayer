@@ -40,6 +40,7 @@ var gameDataRef = firebase.database().ref("gameData");
 var p1Ref = firebase.database().ref("player1Data");
 var p2Ref = firebase.database().ref("player2Data");
 var infoRef = firebase.database().ref("info");
+var chatRef = firebase.database().ref("chat");
 
 var connectionsRef = database.ref("/connections");
 var connectedRef = database.ref(".info/connected");
@@ -73,6 +74,12 @@ connectedRef.on("value", function(snap){
                 $(".player").text("Spectating");
             }
             playerLocked = true;
+        }
+        if(snap.numChildren() === 1){
+            $(".chatBox").val("");
+            chatRef.set({
+                comment:" "
+            });
         }
     });
   
@@ -117,7 +124,15 @@ connectedRef.on("value", function(snap){
     infoRef.on("value", function(snapshot){
         var data = snapshot.val();
         $(".info").text(data.info);
-    })
+    });
+
+    chatRef.on("child_added", function(snapshot){
+        var data = snapshot.val();
+        console.log("comment: " + data.comment);
+        if(data.comment){
+            $(".chatBox").val($(".chatBox").val() + data.comment + "\n");
+        }
+    });
   
   $(document).on("click", function(event){
     if(playerNum === 1 || playerNum === 2){
@@ -213,6 +228,25 @@ connectedRef.on("value", function(snap){
         player2Answer:p2Answer
       });
    
-  }
-  
+  } 
+
+$(".chat").keyup(function(event) {
+    if(playerNum === 1 || playerNum === 2){
+        let user = "";
+        if(playerNum === 1){
+            user = "Player1: ";
+        }
+        else{
+            user = "Player2: ";
+        }
+        if (event.keyCode === 13) {
+            let inp = user + $(".chat").val();
+            chatRef.push({
+                comment:inp
+            });
+            $(".chat").val("");
+        }
+    }
+});
+
 });
