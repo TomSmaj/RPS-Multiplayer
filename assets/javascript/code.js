@@ -151,6 +151,8 @@ connectedRef.on("value", function(snap){
         console.log("comment: " + data.comment);
         if(data.comment){
             $(".chatBox").val($(".chatBox").val() + data.comment + "\n");
+            //$(".chatBox").scrollTop = $(".chatBox").scrollHeight;
+            $(".chatBox").scrollTop($(".chatBox")[0].scrollHeight);
         }
     });
   
@@ -161,21 +163,34 @@ connectedRef.on("value", function(snap){
         var targ = event.target;
         var id = targ.id;
         
-        //add (playerNum === 1)
-        if(id === "p1" && !p1Ready && playerNum === 1){
-        console.log("p1 click");
-        p1Answer = targ.value;
-        p1Ready = true;
-        p1Ref.set({
-            player1Ready:p1Ready,   
-            player1Answer:p1Answer
-        });
-        infoRef.set({
-            info:"Waiting for Player 2..."  
-            });
-        //$(".info").text("Waiting for Player 2...");
+        if(id === "p1"){
+            if(!p1Ready && playerNum === 1){
+                console.log("p1 click");
+                p1Answer = targ.value;
+                p1Ready = true;
+                p1Ref.set({
+                    player1Ready:p1Ready,   
+                    player1Answer:p1Answer
+                });
+                infoRef.set({
+                    info:"Waiting for Player 2..."  
+                });
+            }
+            else if(!p2Ready && playerNum === 2){
+                console.log("p2 click");
+                p2Answer = targ.value;
+                p2Ready = true;
+                p2Ref.set({
+                    player2Ready:p2Ready,   
+                    player2Answer:p2Answer
+                });
+                infoRef.set({
+                    info:"Waiting for Player 1..."  
+                    });
+            }
         }
-        //add (playerNum === 2)
+
+        /*
         else if(id === "p2" && !p2Ready && playerNum === 2){
         console.log("p2 click");
         p2Answer = targ.value;
@@ -187,8 +202,9 @@ connectedRef.on("value", function(snap){
         infoRef.set({
             info:"Waiting for Player 1..."  
             });
-        //$(".info").text("Waiting for Player 1...");
         }
+        */
+
         if(p1Ready && p2Ready){
         checkWinner();
         }  
