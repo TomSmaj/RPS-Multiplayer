@@ -8,3 +8,26 @@
 .chatBox{
     width: 100%
 }
+
+body{
+    background-image: url("../images/rock-paper-scissors-pattern-background.jpg");
+}
+
+
+.displayBox{
+    background-color: white;
+    box-sizing: border-box;
+    border: solid black 3px;
+    padding: 7px;
+    border-radius: 10px;
+    margin: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    height: 100%;
+}
+
+.container-fluid{
+    width: 100%;
+    height: 100%;
+}
+

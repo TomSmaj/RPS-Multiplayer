@@ -76,6 +76,7 @@ connectedRef.on("value", function(snap){
             playerLocked = true;
         }
         //when the number of players drops down to 1, the stored chat and info being displayed is cleared
+        //alos wins and ties ar reset as well
         if(snap.numChildren() === 1){
             $(".chatBox").val("");
             chatRef.set({
@@ -84,6 +85,21 @@ connectedRef.on("value", function(snap){
             infoRef.set({
                 info:""
             });
+            gameDataRef.set({
+                player1Wins:0,
+                player2Wins:0,
+                ties:0
+              });
+            
+            p1Ref.set({
+                player1Ready:false,   
+                player1Answer:""
+              });
+            
+            p2Ref.set({
+                player2Ready:false,   
+                player2Answer:""
+              });
         }
     });
   
